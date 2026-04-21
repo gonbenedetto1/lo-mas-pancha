@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lo Más Pancha — Gestión</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧁</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#fdf6f0;--bg2:#fff;--bg3:#fceee4;
+--brand:#c97b5a;--brand2:#a85d3f;--brand3:#f5d5c3;
+--accent:#7a9e7e;--accent2:#5b7d5f;
+--danger:#d45d5d;--warn:#e8a849;
+--text:#3d2c22;--text2:#7a6558;--text3:#b09a8e;
+--border:#e8d5c8;--border2:#f0e3d8;
+--radius:10px;--shadow:0 2px 8px rgba(61,44,34,0.06);--shadow-lg:0 8px 24px rgba(61,44,34,0.1);
+}
+html{font-size:15px}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex}
+a{text-decoration:none;color:inherit}
+button{font-family:'Nunito',sans-serif;cursor:pointer;border:none}
+input,select,textarea{font-family:'Nunito',sans-serif}
+
+/* Sidebar */
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border2);min-height:100vh;position:fixed;left:0;top:0;z-index:50;display:flex;flex-direction:column;transition:transform 0.3s}
+.sidebar-logo{padding:1.2rem;display:flex;align-items:center;gap:0.7rem;border-bottom:1px solid var(--border2)}
+.sidebar-logo img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.sidebar-logo span{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--brand)}
+.sidebar-nav{flex:1;padding:0.8rem 0}
+.nav-item{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 1.2rem;font-size:0.88rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.2s;border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg3);color:var(--brand);border-left-color:var(--brand)}
+.nav-item span{font-size:1.1rem}
+.sidebar-toggle{display:none;position:fixed;top:0.8rem;left:0.8rem;z-index:60;width:40px;height:40px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);font-size:1.2rem;color:var(--text);box-shadow:var(--shadow)}
+
+/* Main */
+.main{margin-left:240px;flex:1;padding:1.5rem 2rem;min-height:100vh}
+.main-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem}
+.main-title{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700}
+.btn{padding:0.55rem 1.2rem;border-radius:8px;font-size:0.85rem;font-weight:700;transition:all 0.2s;display:inline-flex;align-items:center;gap:0.4rem}
+.btn-primary{background:var(--brand);color:#fff}.btn-primary:hover{background:var(--brand2)}
+.btn-accent{background:var(--accent);color:#fff}.btn-accent:hover{background:var(--accent2)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--brand);color:var(--brand)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{opacity:0.9}
+.btn-sm{padding:0.35rem 0.8rem;font-size:0.78rem}
+
+/* Cards */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:1.2rem;box-shadow:var(--shadow)}
+.stat-label{font-size:0.75rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem}
+.stat-value{font-size:1.8rem;font-weight:800;color:var(--text);line-height:1.2}
+.stat-sub{font-size:0.78rem;color:var(--text2);margin-top:0.2rem}
+.stat-icon{float:right;font-size:1.5rem;opacity:0.3}
+
+/* Tables */
+.table-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.table-header{padding:1rem 1.2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border2)}
+.table-title{font-weight:700;font-size:0.95rem}
+table{width:100%;border-collapse:collapse}
+th{padding:0.65rem 1rem;text-align:left;font-size:0.75rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border2);background:var(--bg)}
+td{padding:0.65rem 1rem;font-size:0.88rem;border-bottom:1px solid var(--border2)}
+tr:hover{background:var(--bg)}
+.badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:20px;font-size:0.72rem;font-weight:700}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#991b1b}
+
+/* Modal */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border-radius:14px;max-width:550px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:fadeUp 0.25s ease}
+.modal-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border2);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:1.05rem;font-weight:700}
+.modal-close{background:none;font-size:1.2rem;color:var(--text3);padding:0.3rem}
+.modal-body{padding:1.5rem}
+.form-group{margin-bottom:1rem}
+.form-group label{display:block;font-size:0.82rem;font-weight:600;color:var(--text2);margin-bottom:0.3rem}
+.form-input{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:8px;font-size:0.88rem;outline:none;background:var(--bg);transition:border-color 0.2s}
+.form-input:focus{border-color:var(--brand)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--border2);display:flex;justify-content:flex-end;gap:0.5rem}
+
+/* Chart placeholder */
+.chart-card{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);padding:1.2rem;box-shadow:var(--shadow);margin-bottom:1.5rem}
+.chart-title{font-weight:700;font-size:0.95rem;margin-bottom:1rem}
+.chart-bar-wrap{display:flex;gap:0.4rem;align-items:flex-end;height:160px;padding-top:0.5rem}
+.chart-bar{flex:1;background:var(--brand3);border-radius:6px 6px 0 0;transition:all 0.3s;position:relative;min-height:4px}
+.chart-bar:hover{background:var(--brand)}
+.chart-bar-label{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:0.65rem;color:var(--text3);white-space:nowrap}
+.chart-bar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:0.68rem;font-weight:700;color:var(--text2)}
+
+/* Page sections */
+.page{display:none}
+.page.active{display:block}
+.section-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+.empty-state{text-align:center;padding:3rem;color:var(--text3);font-size:0.92rem}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Responsive */
+@media(max-width:900px){
+.stat-grid{grid-template-columns:repeat(2,1fr)}
+.section-grid{grid-template-columns:1fr}
+.sidebar{transform:translateX(-100%)}
+.sidebar.open{transform:translateX(0)}
+.sidebar-toggle{display:flex;align-items:center;justify-content:center}
+.main{margin-left:0;padding:1.25rem;padding-top:3.5rem}
+}
+@media(max-width:500px){
+.stat-grid{grid-template-columns:1fr}
+.form-row{grid-template-columns:1fr}
+.main-header{flex-direction:column;align-items:flex-start;gap:0.8rem}
+}
+</style>
+</head>
+<body>
+
+<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-logo">
+<img id="logo-img" alt="Logo">
+<span>Lo Más Pancha</span>
+</div>
+<nav class="sidebar-nav">
+<div class="nav-item active" onclick="showPage('dashboard')"><span>📊</span> Dashboard</div>
+<div class="nav-item" onclick="showPage('productos')"><span>🧁</span> Productos</div>
+<div class="nav-item" onclick="showPage('compras')"><span>🛒</span> Compras</div>
+<div class="nav-item" onclick="showPage('ventas')"><span>💰</span> Ventas</div>
+<div class="nav-item" onclick="showPage('costos')"><span>🔢</span> Costos</div>
+<div class="nav-item" onclick="showPage('inteligencia')"><span>🧠</span> Inteligencia</div>
+</nav>
+</aside>
+
+<main class="main">
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page active" id="page-dashboard">
+<div class="main-header"><div class="main-title">Dashboard</div><div class="btn btn-outline btn-sm" onclick="exportData()">📥 Exportar datos</div></div>
+<div class="stat-grid" id="dash-stats"></div>
+<div class="section-grid">
+<div class="chart-card"><div class="chart-title">Ventas últimos 7 días</div><div class="chart-bar-wrap" id="chart-ventas7"></div></div>
+<div class="chart-card"><div class="chart-title">Productos más vendidos</div><div class="chart-bar-wrap" id="chart-top-prods"></div></div>
+</div>
+<div class="table-wrap">
+<div class="table-header"><div class="table-title">Últimas ventas</div></div>
+<table><thead><tr><th>Fecha</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th></tr></thead><tbody id="dash-ventas-body"></tbody></table>
+</div>
+</div>
+
+<!-- ═══ PRODUCTOS ═══ -->
+<div class="page" id="page-productos">
+<div class="main-header"><div class="main-title">Productos</div><button class="btn btn-primary" onclick="openModal('producto')">+ Nuevo producto</button></div>
+<div class="table-wrap">
+<table><thead><tr><th>Producto</th><th>Categoría</th><th>Costo unit.</th><th>Precio venta</th><th>Margen</th><th>Acciones</th></tr></thead><tbody id="productos-body"></tbody></table>
+</div>
+</div>
+
+<!-- ═══ COMPRAS ═══ -->
+<div class="page" id="page-compras">
+<div class="main-header"><div class="main-title">Compras de insumos</div><button class="btn btn-primary" onclick="openModal('compra')">+ Nueva compra</button></div>
+<div class="stat-grid" id="compras-stats"></div>
+<div class="table-wrap">
+<table><thead><tr><th>Fecha</th><th>Insumo</th><th>Cantidad</th><th>Precio total</th><th>Precio/unidad</th><th>Acciones</th></tr></thead><tbody id="compras-body"></tbody></table>
+</div>
+</div>
+
+<!-- ═══ VENTAS ═══ -->
+<div class="page" id="page-ventas">
+<div class="main-header"><div class="main-title">Ventas / Pedidos</div><button class="btn btn-primary" onclick="openModal('venta')">+ Nueva venta</button></div>
+<div class="stat-grid" id="ventas-stats"></div>
+<div class="table-wrap">
+<table><thead><tr><th>Fecha</th><th>Cliente</th><th>Detalle</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="ventas-body"></tbody></table>
+</div>
+</div>
+
+<!-- ═══ COSTOS ═══ -->
+<div class="page" id="page-costos">
+<div class="main-header"><div class="main-title">Calculadora de costos</div></div>
+<div class="section-grid">
+<div class="chart-card">
+<div class="chart-title">Calcular costo por unidad</div>
+<div class="form-group"><label>Producto</label><select class="form-input" id="costo-prod" onchange="calcularCosto()"><option value="">Seleccioná un producto</option></select></div>
+<div class="form-group"><label>Cantidad producida</label><input class="form-input" type="number" id="costo-qty" value="1" min="1" oninput="calcularCosto()"></div>
+<div id="costo-result" style="margin-top:1rem"></div>
+</div>
+<div class="chart-card">
+<div class="chart-title">Resumen de márgenes</div>
+<div id="margenes-list"></div>
+</div>
+</div>
+</div>
+
+<!-- ═══ INTELIGENCIA ═══ -->
+<div class="page" id="page-inteligencia">
+<div class="main-header"><div class="main-title">Inteligencia de negocio</div></div>
+<div class="stat-grid" id="intel-stats"></div>
+<div class="section-grid">
+<div class="chart-card"><div class="chart-title">Ventas por categoría</div><div class="chart-bar-wrap" id="chart-cat"></div></div>
+<div class="chart-card"><div class="chart-title">Tendencia mensual</div><div class="chart-bar-wrap" id="chart-mensual"></div></div>
+</div>
+<div class="chart-card"><div class="chart-title">💡 Insights del negocio</div><div id="insights-list"></div></div>
+</div>
+
+</main>
+
+<!-- ═══ MODALS ═══ -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+<div class="modal">
+<div class="modal-header"><h3 id="modal-title"></h3><button class="modal-close" onclick="closeModal()">✕</button></div>
+<div class="modal-body" id="modal-body"></div>
+<div class="modal-footer" id="modal-footer"></div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// DATA STORE (localStorage)
+// ═══════════════════════════════════
+const STORE_KEY='lomaspancha_data';
+function getData(){
+  try{return JSON.parse(localStorage.getItem(STORE_KEY))||defaultData()}catch(e){return defaultData()}
+}
+function saveData(d){localStorage.setItem(STORE_KEY,JSON.stringify(d))}
+function defaultData(){return{productos:[],compras:[],ventas:[],recetas:[]}}
+function genId(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
+function fmt(n){return '$'+Number(n||0).toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0})}
+function fmtDec(n){return '$'+Number(n||0).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function dateStr(d){const x=new Date(d);return x.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'2-digit'})}
+function todayStr(){return new Date().toISOString().split('T')[0]}
+
+// ═══════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.textContent.trim().toLowerCase().includes(name.substring(0,4)))n.classList.add('active')});
+  document.querySelector('.sidebar').classList.remove('open');
+  render();
+}
+
+// ═══════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════
+function render(){
+  const d=getData();
+  renderDashboard(d);
+  renderProductos(d);
+  renderCompras(d);
+  renderVentas(d);
+  renderCostos(d);
+  renderInteligencia(d);
+}
+
+// ═══════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════
+function renderDashboard(d){
+  const hoy=todayStr();
+  const mesActual=hoy.substring(0,7);
+  const ventasMes=d.ventas.filter(v=>v.fecha.startsWith(mesActual));
+  const totalVentasMes=ventasMes.reduce((s,v)=>s+Number(v.total||0),0);
+  const comprasMes=d.compras.filter(c=>c.fecha.startsWith(mesActual));
+  const totalComprasMes=comprasMes.reduce((s,c)=>s+Number(c.precioTotal||0),0);
+  const ganancia=totalVentasMes-totalComprasMes;
+  const pedidosPend=d.ventas.filter(v=>v.estado==='pendiente').length;
+
+  document.getElementById('dash-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Ventas del mes</div><div class="stat-value">${fmt(totalVentasMes)}</div><div class="stat-sub">${ventasMes.length} pedidos</div></div>
+    <div class="stat-card"><div class="stat-icon">🛒</div><div class="stat-label">Compras del mes</div><div class="stat-value">${fmt(totalComprasMes)}</div><div class="stat-sub">${comprasMes.length} compras</div></div>
+    <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-label">Ganancia estimada</div><div class="stat-value" style="color:${ganancia>=0?'var(--accent)':'var(--danger)'}">${fmt(ganancia)}</div><div class="stat-sub">Ventas - Compras</div></div>
+    <div class="stat-card"><div class="stat-icon">📋</div><div class="stat-label">Pedidos pendientes</div><div class="stat-value">${pedidosPend}</div><div class="stat-sub">Por entregar</div></div>
+  `;
+
+  // Últimas 5 ventas
+  const ultimas=d.ventas.slice(-5).reverse();
+  document.getElementById('dash-ventas-body').innerHTML=ultimas.length?ultimas.map(v=>`
+    <tr>
+      <td>${dateStr(v.fecha)}</td>
+      <td>${v.cliente||'—'}</td>
+      <td>${v.items?v.items.map(i=>i.nombre).join(', '):'—'}</td>
+      <td><strong>${fmt(v.total)}</strong></td>
+      <td><span class="badge ${v.estado==='entregado'?'badge-green':v.estado==='pendiente'?'badge-yellow':'badge-red'}">${v.estado}</span></td>
+    </tr>
+  `).join(''):'<tr><td colspan="5" class="empty-state">No hay ventas registradas</td></tr>';
+
+  // Chart ventas 7 días
+  renderChart7Dias(d);
+  renderChartTopProds(d);
+}
+
+function renderChart7Dias(d){
+  const dias=[];
+  for(let i=6;i>=0;i--){
+    const dt=new Date();dt.setDate(dt.getDate()-i);
+    const key=dt.toISOString().split('T')[0];
+    const label=dt.toLocaleDateString('es-AR',{weekday:'short'});
+    const total=d.ventas.filter(v=>v.fecha===key).reduce((s,v)=>s+Number(v.total||0),0);
+    dias.push({label,total});
+  }
+  const max=Math.max(...dias.map(d=>d.total),1);
+  document.getElementById('chart-ventas7').innerHTML=dias.map(d=>
+    `<div class="chart-bar" style="height:${Math.max((d.total/max)*140,4)}px"><div class="chart-bar-val">${d.total?fmt(d.total):''}</div><div class="chart-bar-label">${d.label}</div></div>`
+  ).join('');
+}
+
+function renderChartTopProds(d){
+  const counts={};
+  d.ventas.forEach(v=>{(v.items||[]).forEach(i=>{counts[i.nombre]=(counts[i.nombre]||0)+Number(i.cantidad||1)})});
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const max=Math.max(...sorted.map(s=>s[1]),1);
+  document.getElementById('chart-top-prods').innerHTML=sorted.length?sorted.map(([name,qty])=>
+    `<div class="chart-bar" style="height:${Math.max((qty/max)*140,4)}px;background:var(--accent)"><div class="chart-bar-val">${qty}</div><div class="chart-bar-label">${name.length>8?name.substring(0,8)+'…':name}</div></div>`
+  ).join(''):'<div class="empty-state" style="width:100%">Sin datos</div>';
+}
+
+// ═══════════════════════════════════
+// PRODUCTOS
+// ═══════════════════════════════════
+function renderProductos(d){
+  document.getElementById('productos-body').innerHTML=d.productos.length?d.productos.map(p=>{
+    const ef=costoEfectivo(p,d.compras);
+    const costo=ef.valor;
+    const margen=p.precioVenta&&costo?((p.precioVenta-costo)/p.precioVenta*100).toFixed(0):'—';
+    const costoTxt=costo?`${fmtDec(costo)} ${ef.fuente==='receta'?'<span style="font-size:0.7rem;color:var(--accent);font-weight:700">🧾</span>':''}`:'—';
+    return `<tr>
+      <td><strong>${p.nombre}</strong></td>
+      <td>${p.categoria||'—'}</td>
+      <td>${costoTxt}</td>
+      <td>${p.precioVenta?fmt(p.precioVenta):'—'}</td>
+      <td>${margen!=='—'?`<span class="badge ${margen>=30?'badge-green':margen>=15?'badge-yellow':'badge-red'}">${margen}%</span>`:'—'}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="editProducto('${p.id}')">✏️</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteItem('productos','${p.id}')">🗑️</button>
+      </td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty-state">No hay productos. Creá el primero.</td></tr>';
+}
+
+// ═══════════════════════════════════
+// COMPRAS
+// ═══════════════════════════════════
+function renderCompras(d){
+  const total=d.compras.reduce((s,c)=>s+Number(c.precioTotal||0),0);
+  const mesActual=todayStr().substring(0,7);
+  const totalMes=d.compras.filter(c=>c.fecha.startsWith(mesActual)).reduce((s,c)=>s+Number(c.precioTotal||0),0);
+  
+  document.getElementById('compras-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total compras</div><div class="stat-value">${fmt(total)}</div></div>
+    <div class="stat-card"><div class="stat-label">Compras este mes</div><div class="stat-value">${fmt(totalMes)}</div></div>
+    <div class="stat-card"><div class="stat-label">Insumos distintos</div><div class="stat-value">${new Set(d.compras.map(c=>c.insumo)).size}</div></div>
+    <div class="stat-card"><div class="stat-label">Nº de compras</div><div class="stat-value">${d.compras.length}</div></div>
+  `;
+
+  document.getElementById('compras-body').innerHTML=d.compras.length?d.compras.slice().reverse().map(c=>{
+    const pu=c.cantidad?Number(c.precioTotal)/Number(c.cantidad):0;
+    return `<tr>
+      <td>${dateStr(c.fecha)}</td>
+      <td><strong>${c.insumo}</strong></td>
+      <td>${c.cantidad} ${c.unidad||'u.'}</td>
+      <td>${fmt(c.precioTotal)}</td>
+      <td>${fmtDec(pu)}/${c.unidad||'u.'}</td>
+      <td><button class="btn btn-outline btn-sm" onclick="deleteItem('compras','${c.id}')">🗑️</button></td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6" class="empty-state">No hay compras registradas</td></tr>';
+}
+
+// ═══════════════════════════════════
+// VENTAS
+// ═══════════════════════════════════
+function renderVentas(d){
+  const total=d.ventas.reduce((s,v)=>s+Number(v.total||0),0);
+  const mesActual=todayStr().substring(0,7);
+  const totalMes=d.ventas.filter(v=>v.fecha.startsWith(mesActual)).reduce((s,v)=>s+Number(v.total||0),0);
+  const pend=d.ventas.filter(v=>v.estado==='pendiente').length;
+
+  document.getElementById('ventas-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total ventas</div><div class="stat-value">${fmt(total)}</div></div>
+    <div class="stat-card"><div class="stat-label">Ventas este mes</div><div class="stat-value">${fmt(totalMes)}</div></div>
+    <div class="stat-card"><div class="stat-label">Pedidos pendientes</div><div class="stat-value">${pend}</div></div>
+    <div class="stat-card"><div class="stat-label">Nº de ventas</div><div class="stat-value">${d.ventas.length}</div></div>
+  `;
+
+  document.getElementById('ventas-body').innerHTML=d.ventas.length?d.ventas.slice().reverse().map(v=>`
+    <tr>
+      <td>${dateStr(v.fecha)}</td>
+      <td>${v.cliente||'—'}</td>
+      <td>${v.items?v.items.map(i=>`${i.cantidad}x ${i.nombre}`).join(', '):'—'}</td>
+      <td><strong>${fmt(v.total)}</strong></td>
+      <td>
+        <select class="form-input" style="padding:0.3rem;font-size:0.78rem;width:auto" onchange="updateEstado('${v.id}',this.value)">
+          <option value="pendiente" ${v.estado==='pendiente'?'selected':''}>⏳ Pendiente</option>
+          <option value="entregado" ${v.estado==='entregado'?'selected':''}>✅ Entregado</option>
+          <option value="cancelado" ${v.estado==='cancelado'?'selected':''}>❌ Cancelado</option>
+        </select>
+      </td>
+      <td><button class="btn btn-outline btn-sm" onclick="deleteItem('ventas','${v.id}')">🗑️</button></td>
+    </tr>
+  `).join(''):'<tr><td colspan="6" class="empty-state">No hay ventas registradas</td></tr>';
+}
+
+function updateEstado(id,estado){
+  const d=getData();
+  const v=d.ventas.find(x=>x.id===id);
+  if(v){v.estado=estado;saveData(d);render()}
+}
+
+// ═══════════════════════════════════
+// COSTOS
+// ═══════════════════════════════════
+function renderCostos(d){
+  const sel=document.getElementById('costo-prod');
+  const current=sel.value;
+  sel.innerHTML='<option value="">Seleccioná un producto</option>'+d.productos.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');
+  if(current)sel.value=current;
+  calcularCosto();
+  
+  // Márgenes — compara costo de receta vs manual y muestra el efectivo
+  document.getElementById('margenes-list').innerHTML=d.productos.filter(p=>p.precioVenta).map(p=>{
+    const ef=costoEfectivo(p,d.compras);
+    const costo=ef.valor;
+    const margen=costo?((p.precioVenta-costo)/p.precioVenta*100).toFixed(1):'—';
+    const gananciaU=p.precioVenta-costo;
+    const fuenteBadge=ef.fuente==='receta'?'<span class="badge badge-green" style="font-size:0.7rem">🧾 Receta</span>':'<span class="badge badge-yellow" style="font-size:0.7rem">✏️ Manual</span>';
+    return `<div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid var(--border2)">
+      <div><strong>${p.nombre}</strong> ${fuenteBadge}<div style="font-size:0.78rem;color:var(--text3)">Costo: ${fmtDec(costo)} → Venta: ${fmt(p.precioVenta)}</div></div>
+      <div style="text-align:right">${margen!=='—'?`<span class="badge ${margen>=30?'badge-green':margen>=15?'badge-yellow':'badge-red'}">${margen}%</span>`:''}<div style="font-size:0.78rem;color:var(--accent);font-weight:700">+${fmt(gananciaU)}/u.</div></div>
+    </div>`;
+  }).join('')||'<div class="empty-state">Cargá productos con precio de venta</div>';
+}
+
+function calcularCosto(){
+  const d=getData();
+  const prodId=document.getElementById('costo-prod').value;
+  const qty=Number(document.getElementById('costo-qty').value)||1;
+  const cont=document.getElementById('costo-result');
+  if(!prodId){cont.innerHTML='';return}
+  
+  const p=d.productos.find(x=>x.id===prodId);
+  if(!p){cont.innerHTML='';return}
+  
+  const r=costoReceta(p,d.compras);
+  const ef=costoEfectivo(p,d.compras);
+  
+  // Desglose de receta (si existe)
+  let desgloseHTML='';
+  if(p.receta&&p.receta.length){
+    const lineas=p.receta.map(l=>{
+      const cl=costoLineaReceta(l,d.compras);
+      if(cl.costo==null){
+        return `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;color:var(--danger)"><span>${l.cantidad} ${l.unidad} de <strong>${l.insumo}</strong></span><span>⚠️ ${cl.motivo}</span></div>`;
+      }
+      return `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;border-bottom:1px dashed var(--border2)"><span>${l.cantidad} ${l.unidad} de <strong>${l.insumo}</strong></span><span>${fmtDec(cl.costo)}</span></div>`;
+    }).join('');
+    const rindeTxt=r.rinde>1?`<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;color:var(--text2)"><span>Rinde:</span><span>${r.rinde} u. por receta</span></div>`:'';
+    desgloseHTML=`
+      <div style="background:var(--bg2);border:1px solid var(--border);padding:0.8rem;border-radius:10px;margin-bottom:0.8rem">
+        <div style="font-weight:700;margin-bottom:0.5rem;color:var(--brand)">🧾 Desglose de la receta</div>
+        ${lineas}
+        <div style="display:flex;justify-content:space-between;padding:0.4rem 0;margin-top:0.3rem;border-top:1px solid var(--border);font-weight:700"><span>Costo total de receta:</span><span>${fmtDec(r.costoReceta)}</span></div>
+        ${rindeTxt}
+        <div style="display:flex;justify-content:space-between;padding:0.3rem 0;color:var(--brand);font-weight:700"><span>Costo por unidad (receta):</span><span>${fmtDec(r.costoUnitario)}</span></div>
+      </div>`;
+  }
+  
+  // Cálculo para la cantidad solicitada usando costo efectivo
+  const costoUnit=ef.valor;
+  const costoTotal=costoUnit*qty;
+  const ventaTotal=(p.precioVenta||0)*qty;
+  const ganancia=ventaTotal-costoTotal;
+  const margen=p.precioVenta?((p.precioVenta-costoUnit)/p.precioVenta*100).toFixed(1):null;
+  
+  cont.innerHTML=`
+    ${desgloseHTML}
+    <div style="background:var(--bg3);padding:1rem;border-radius:10px">
+      <div style="font-size:0.78rem;color:var(--text3);margin-bottom:0.5rem">Usando costo ${ef.fuente==='receta'?'calculado desde la receta':'cargado manualmente'}</div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span>Costo unitario:</span><strong>${fmtDec(costoUnit)}</strong></div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span>Costo total (×${qty}):</span><strong>${fmt(costoTotal)}</strong></div>
+      ${p.precioVenta?`
+      <div style="border-top:1px solid var(--border);padding-top:0.5rem;margin-top:0.5rem">
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.5rem"><span>Venta total (×${qty}):</span><strong>${fmt(ventaTotal)}</strong></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem"><span>Ganancia:</span><strong style="color:${ganancia>=0?'var(--accent)':'var(--danger)'}">${fmt(ganancia)}</strong></div>
+        ${margen?`<div style="display:flex;justify-content:space-between"><span>Margen:</span><strong>${margen}%</strong></div>`:''}
+      </div>`:''}
+      ${ef.fuente==='receta'&&p.costoUnitario&&Math.abs(p.costoUnitario-ef.valor)>0.01?`
+      <div style="border-top:1px solid var(--border);padding-top:0.5rem;margin-top:0.5rem;display:flex;justify-content:space-between;align-items:center;font-size:0.82rem">
+        <span style="color:var(--text2)">Costo manual cargado: ${fmtDec(p.costoUnitario)}</span>
+        <button class="btn btn-outline btn-sm" onclick="sincronizarCostoProducto('${p.id}')">Sincronizar</button>
+      </div>`:''}
+    </div>
+  `;
+}
+
+// Actualiza el costoUnitario manual del producto con el calculado por receta
+function sincronizarCostoProducto(id){
+  const d=getData();
+  const p=d.productos.find(x=>x.id===id);
+  if(!p)return;
+  const ef=costoEfectivo(p,d.compras);
+  if(ef.fuente!=='receta'){alert('Este producto no tiene receta completa');return}
+  p.costoUnitario=Math.round(ef.valor*100)/100;
+  saveData(d);render();
+}
+
+// ═══════════════════════════════════
+// INTELIGENCIA
+// ═══════════════════════════════════
+function renderInteligencia(d){
+  const totalVentas=d.ventas.reduce((s,v)=>s+Number(v.total||0),0);
+  const totalCompras=d.compras.reduce((s,c)=>s+Number(c.precioTotal||0),0);
+  const margenGlobal=totalVentas?(((totalVentas-totalCompras)/totalVentas)*100).toFixed(1):'0';
+  const ticketProm=d.ventas.length?(totalVentas/d.ventas.length).toFixed(0):'0';
+  const clientesUnicos=new Set(d.ventas.map(v=>v.cliente).filter(Boolean)).size;
+
+  document.getElementById('intel-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-icon">📊</div><div class="stat-label">Margen global</div><div class="stat-value">${margenGlobal}%</div><div class="stat-sub">(Ventas - Compras) / Ventas</div></div>
+    <div class="stat-card"><div class="stat-icon">🎫</div><div class="stat-label">Ticket promedio</div><div class="stat-value">${fmt(ticketProm)}</div><div class="stat-sub">Por pedido</div></div>
+    <div class="stat-card"><div class="stat-icon">👥</div><div class="stat-label">Clientes únicos</div><div class="stat-value">${clientesUnicos}</div></div>
+    <div class="stat-card"><div class="stat-icon">🧁</div><div class="stat-label">Productos activos</div><div class="stat-value">${d.productos.length}</div></div>
+  `;
+
+  // Por categoría
+  const catTotals={};
+  d.ventas.forEach(v=>{(v.items||[]).forEach(i=>{
+    const prod=d.productos.find(p=>p.id===i.productoId||p.nombre===i.nombre);
+    const cat=prod?.categoria||'Sin categoría';
+    catTotals[cat]=(catTotals[cat]||0)+Number(i.subtotal||0);
+  })});
+  const catSorted=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+  const catMax=Math.max(...catSorted.map(s=>s[1]),1);
+  document.getElementById('chart-cat').innerHTML=catSorted.length?catSorted.map(([cat,tot])=>
+    `<div class="chart-bar" style="height:${Math.max((tot/catMax)*140,4)}px;background:var(--brand)"><div class="chart-bar-val">${fmt(tot)}</div><div class="chart-bar-label">${cat.length>10?cat.substring(0,10)+'…':cat}</div></div>`
+  ).join(''):'<div class="empty-state" style="width:100%">Sin datos</div>';
+
+  // Mensual
+  const mesesTotals={};
+  d.ventas.forEach(v=>{const m=v.fecha.substring(0,7);mesesTotals[m]=(mesesTotals[m]||0)+Number(v.total||0)});
+  const mesesSorted=Object.entries(mesesTotals).sort((a,b)=>a[0].localeCompare(b[0])).slice(-6);
+  const mesMax=Math.max(...mesesSorted.map(s=>s[1]),1);
+  document.getElementById('chart-mensual').innerHTML=mesesSorted.length?mesesSorted.map(([mes,tot])=>
+    `<div class="chart-bar" style="height:${Math.max((tot/mesMax)*140,4)}px;background:var(--accent)"><div class="chart-bar-val">${fmt(tot)}</div><div class="chart-bar-label">${mes.substring(5)}</div></div>`
+  ).join(''):'<div class="empty-state" style="width:100%">Sin datos</div>';
+
+  // Insights
+  const insights=[];
+  if(d.productos.length>0){
+    const sinPrecio=d.productos.filter(p=>!p.precioVenta);
+    if(sinPrecio.length)insights.push({icon:'⚠️',text:`Tenés ${sinPrecio.length} producto(s) sin precio de venta definido.`});
+    const bajoMargen=d.productos.filter(p=>p.precioVenta&&p.costoUnitario&&((p.precioVenta-p.costoUnitario)/p.precioVenta)<0.2);
+    if(bajoMargen.length)insights.push({icon:'📉',text:`${bajoMargen.map(p=>p.nombre).join(', ')} tiene(n) margen menor al 20%. Considerá ajustar precios.`});
+  }
+  if(d.ventas.length>=5){
+    const counts={};
+    d.ventas.forEach(v=>(v.items||[]).forEach(i=>{counts[i.nombre]=(counts[i.nombre]||0)+Number(i.cantidad||1)}));
+    const top=Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+    if(top)insights.push({icon:'⭐',text:`Tu producto estrella es "${top[0]}" con ${top[1]} unidades vendidas.`});
+  }
+  if(Number(margenGlobal)<20&&totalVentas>0)insights.push({icon:'🔴',text:`Tu margen global es ${margenGlobal}%. Lo ideal es mantenerlo arriba del 30%.`});
+  if(Number(margenGlobal)>=30)insights.push({icon:'🟢',text:`Buen margen global de ${margenGlobal}%. ¡Seguí así!`});
+  if(!insights.length)insights.push({icon:'💡',text:'Cargá más datos para obtener insights del negocio.'});
+
+  document.getElementById('insights-list').innerHTML=insights.map(i=>
+    `<div style="display:flex;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--border2);align-items:flex-start"><span style="font-size:1.2rem">${i.icon}</span><span style="font-size:0.9rem;line-height:1.5">${i.text}</span></div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════
+// MODALS
+// ═══════════════════════════════════
+let ventaItems=[];
+let recetaDraft=[];
+let recetaRinde=1;
+
+// ── Conversión de unidades (kg↔g, lt↔ml, docena↔u.) ──
+const UNIDAD_BASE={kg:'kg',g:'kg',lt:'lt',ml:'lt',u:'u','u.':'u',docena:'u',paquete:'paquete'};
+const UNIDAD_FACTOR={kg:1,g:0.001,lt:1,ml:0.001,u:1,'u.':1,docena:12,paquete:1};
+function toBase(cantidad,unidad){
+  const u=unidad||'u.';
+  return {base:UNIDAD_BASE[u]||u, qty:Number(cantidad||0)*(UNIDAD_FACTOR[u]||1)};
+}
+
+// ── Precio unitario (en unidad base) del insumo, según última compra ──
+function precioInsumo(insumoNombre,compras){
+  const matches=compras.filter(c=>c.insumo.trim().toLowerCase()===insumoNombre.trim().toLowerCase());
+  if(!matches.length)return null;
+  const ultima=matches.slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))[0];
+  const {base,qty}=toBase(ultima.cantidad,ultima.unidad);
+  if(!qty)return null;
+  return {precioPorBase:Number(ultima.precioTotal)/qty, unidadBase:base, ultimaFecha:ultima.fecha, ultimaCompra:ultima};
+}
+
+// ── Costo de una línea de receta ──
+function costoLineaReceta(linea,compras){
+  const info=precioInsumo(linea.insumo,compras);
+  if(!info)return {costo:null,motivo:'sin compras'};
+  const {base,qty}=toBase(linea.cantidad,linea.unidad);
+  if(base!==info.unidadBase)return {costo:null,motivo:`unidad incompatible (${linea.unidad} vs ${info.ultimaCompra.unidad})`};
+  return {costo:qty*info.precioPorBase, precioPorBase:info.precioPorBase, unidadBase:info.unidadBase, ultimaFecha:info.ultimaFecha};
+}
+
+// ── Costo total de la receta del producto (por unidad producida) ──
+function costoReceta(producto,compras){
+  if(!producto.receta||!producto.receta.length)return null;
+  const rinde=Number(producto.rinde)||1;
+  let total=0, faltantes=[];
+  producto.receta.forEach(l=>{
+    const r=costoLineaReceta(l,compras);
+    if(r.costo==null)faltantes.push(`${l.insumo} (${r.motivo})`);
+    else total+=r.costo;
+  });
+  return {costoReceta:total, costoUnitario:total/rinde, faltantes, rinde};
+}
+
+// ── Costo "efectivo" del producto: receta si existe y está completa, sino manual ──
+function costoEfectivo(producto,compras){
+  const r=costoReceta(producto,compras);
+  if(r&&!r.faltantes.length)return {valor:r.costoUnitario, fuente:'receta'};
+  return {valor:Number(producto.costoUnitario)||0, fuente:'manual'};
+}
+
+// ── Renderizar items de la receta en el modal de producto ──
+function renderRecetaItems(){
+  const d=getData();
+  const cont=document.getElementById('receta-items-list');
+  if(!cont)return;
+  if(!recetaDraft.length){
+    cont.innerHTML='<div style="padding:0.6rem;background:var(--bg3);border-radius:8px;font-size:0.82rem;color:var(--text3);text-align:center">Sin ingredientes. Agregá al menos uno para calcular el costo automáticamente.</div>';
+  }else{
+    cont.innerHTML=recetaDraft.map((l,idx)=>{
+      const r=costoLineaReceta(l,d.compras);
+      const costoTxt=r.costo!=null?fmtDec(r.costo):`<span style="color:var(--danger)">— ${r.motivo}</span>`;
+      return `<div style="display:grid;grid-template-columns:1.5fr 0.8fr 0.8fr auto auto;gap:0.5rem;align-items:center;padding:0.4rem 0;border-bottom:1px solid var(--border2);font-size:0.85rem">
+        <div><strong>${l.insumo}</strong></div>
+        <div>${l.cantidad} ${l.unidad}</div>
+        <div style="color:var(--text2)">${costoTxt}</div>
+        <div></div>
+        <button class="btn btn-outline btn-sm" onclick="removeRecetaItem(${idx})" style="padding:0.2rem 0.5rem">✕</button>
+      </div>`;
+    }).join('');
+  }
+  // Resumen
+  const fakeProd={receta:recetaDraft,rinde:recetaRinde};
+  const r=costoReceta(fakeProd,d.compras);
+  const res=document.getElementById('receta-resumen');
+  if(!res)return;
+  if(!r||!recetaDraft.length){res.innerHTML='';return}
+  const faltanTxt=r.faltantes.length?`<div style="color:var(--danger);font-size:0.78rem;margin-top:0.3rem">⚠️ Faltan datos: ${r.faltantes.join(', ')}</div>`:'';
+  res.innerHTML=`<div style="background:var(--bg3);padding:0.8rem;border-radius:10px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem"><span>Costo total de la receta:</span><strong>${fmtDec(r.costoReceta)}</strong></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem"><span>Rinde:</span><strong>${r.rinde} u.</strong></div>
+    <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:0.3rem;margin-top:0.3rem;color:var(--brand)"><span><strong>Costo unitario calculado:</strong></span><strong>${fmtDec(r.costoUnitario)}</strong></div>
+    ${faltanTxt}
+  </div>`;
+}
+
+function addRecetaItem(){
+  const ins=document.getElementById('f-rec-insumo').value.trim();
+  const qty=Number(document.getElementById('f-rec-qty').value);
+  const un=document.getElementById('f-rec-unidad').value;
+  if(!ins||!qty){alert('Completá insumo y cantidad');return}
+  recetaDraft.push({insumo:ins,cantidad:qty,unidad:un});
+  document.getElementById('f-rec-insumo').value='';
+  document.getElementById('f-rec-qty').value='1';
+  renderRecetaItems();
+}
+
+function removeRecetaItem(idx){recetaDraft.splice(idx,1);renderRecetaItems()}
+
+function openModal(type,editId){
+  const d=getData();
+  document.getElementById('modal-overlay').classList.add('open');
+  const body=document.getElementById('modal-body');
+  const footer=document.getElementById('modal-footer');
+  
+  if(type==='producto'){
+    const p=editId?d.productos.find(x=>x.id===editId):null;
+    document.getElementById('modal-title').textContent=p?'Editar producto':'Nuevo producto';
+    recetaDraft=p?.receta?JSON.parse(JSON.stringify(p.receta)):[];
+    recetaRinde=p?.rinde||1;
+    body.innerHTML=`
+      <div class="form-group"><label>Nombre *</label><input class="form-input" id="f-prod-nombre" value="${p?.nombre||''}"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Categoría</label><input class="form-input" id="f-prod-cat" value="${p?.categoria||''}" placeholder="Ej: Alfajores, Tortas..."></div>
+        <div class="form-group"><label>Precio de venta ($)</label><input class="form-input" type="number" step="0.01" id="f-prod-precio" value="${p?.precioVenta||''}"></div>
+      </div>
+      <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border2)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem">
+        <div style="font-weight:700;font-size:0.9rem">🧾 Receta / Ficha técnica</div>
+        <div style="font-size:0.78rem;color:var(--text3)">Costo calculado desde compras</div>
+      </div>
+      <div id="receta-items-list" style="margin-bottom:0.6rem"></div>
+      <div class="form-row">
+        <div class="form-group"><label>Insumo</label><input class="form-input" id="f-rec-insumo" list="insumos-list" placeholder="Ej: Harina"><datalist id="insumos-list">${[...new Set(d.compras.map(c=>c.insumo))].map(i=>`<option value="${i}">`).join('')}</datalist></div>
+        <div class="form-group"><label>Cantidad</label><input class="form-input" type="number" step="0.01" id="f-rec-qty" value="1"></div>
+        <div class="form-group"><label>Unidad</label><div style="display:flex;gap:0.4rem"><select class="form-input" id="f-rec-unidad" style="flex:1"><option>kg</option><option>g</option><option>lt</option><option>ml</option><option>u.</option><option>docena</option><option>paquete</option></select><button class="btn btn-accent btn-sm" onclick="addRecetaItem()">+</button></div></div>
+      </div>
+      <div class="form-row" style="margin-top:0.5rem">
+        <div class="form-group"><label>Rinde (unidades producidas por receta)</label><input class="form-input" type="number" step="1" min="1" id="f-prod-rinde" value="${p?.rinde||1}" oninput="recetaRinde=Number(this.value)||1;renderRecetaItems()"></div>
+        <div class="form-group"><label>Costo manual unitario ($) — opcional</label><input class="form-input" type="number" step="0.01" id="f-prod-costo" value="${p?.costoUnitario||''}" placeholder="Se usa si no hay receta"></div>
+      </div>
+      <div id="receta-resumen" style="margin-top:0.8rem"></div>
+    `;
+    footer.innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveProducto('${editId||''}')">Guardar</button>`;
+    renderRecetaItems();
+  }
+  
+  if(type==='compra'){
+    document.getElementById('modal-title').textContent='Nueva compra de insumo';
+    body.innerHTML=`
+      <div class="form-group"><label>Fecha</label><input class="form-input" type="date" id="f-comp-fecha" value="${todayStr()}"></div>
+      <div class="form-group"><label>Insumo *</label><input class="form-input" id="f-comp-insumo" placeholder="Ej: Harina, Dulce de leche..."></div>
+      <div class="form-row">
+        <div class="form-group"><label>Cantidad</label><input class="form-input" type="number" step="0.01" id="f-comp-qty" value="1"></div>
+        <div class="form-group"><label>Unidad</label><select class="form-input" id="f-comp-unidad"><option>kg</option><option>g</option><option>lt</option><option>ml</option><option>u.</option><option>docena</option><option>paquete</option></select></div>
+      </div>
+      <div class="form-group"><label>Precio total ($) *</label><input class="form-input" type="number" step="0.01" id="f-comp-precio"></div>
+    `;
+    footer.innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveCompra()">Guardar</button>`;
+  }
+  
+  if(type==='venta'){
+    ventaItems=[];
+    document.getElementById('modal-title').textContent='Nuevo pedido / venta';
+    body.innerHTML=`
+      <div class="form-group"><label>Fecha</label><input class="form-input" type="date" id="f-venta-fecha" value="${todayStr()}"></div>
+      <div class="form-group"><label>Cliente</label><input class="form-input" id="f-venta-cliente" placeholder="Nombre del cliente"></div>
+      <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border2)">
+      <div style="margin-bottom:0.8rem;font-weight:700;font-size:0.88rem">Productos del pedido</div>
+      <div id="venta-items-list"></div>
+      <div class="form-row" style="margin-top:0.5rem">
+        <div class="form-group"><label>Producto</label><select class="form-input" id="f-venta-prod">${d.productos.map(p=>`<option value="${p.id}">${p.nombre} (${fmt(p.precioVenta||0)})</option>`).join('')}</select></div>
+        <div class="form-group"><label>Cantidad</label><div style="display:flex;gap:0.4rem"><input class="form-input" type="number" id="f-venta-qty" value="1" min="1" style="flex:1"><button class="btn btn-accent btn-sm" onclick="addVentaItem()">+</button></div></div>
+      </div>
+      <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border2)">
+      <div style="display:flex;justify-content:space-between;font-size:1.1rem;font-weight:800"><span>Total:</span><span id="venta-total">${fmt(0)}</span></div>
+    `;
+    footer.innerHTML=`<button class="btn btn-outline" onclick="closeModal()">Cancelar</button><button class="btn btn-primary" onclick="saveVenta()">Guardar pedido</button>`;
+  }
+}
+
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open')}
+
+function addVentaItem(){
+  const d=getData();
+  const prodId=document.getElementById('f-venta-prod').value;
+  const qty=Number(document.getElementById('f-venta-qty').value)||1;
+  const prod=d.productos.find(p=>p.id===prodId);
+  if(!prod)return;
+  
+  const existing=ventaItems.find(i=>i.productoId===prodId);
+  if(existing){existing.cantidad+=qty;existing.subtotal=existing.cantidad*prod.precioVenta}
+  else{ventaItems.push({productoId:prodId,nombre:prod.nombre,cantidad:qty,precioUnit:prod.precioVenta||0,subtotal:qty*(prod.precioVenta||0)})}
+  
+  renderVentaItems();
+}
+
+function removeVentaItem(idx){ventaItems.splice(idx,1);renderVentaItems()}
+
+function renderVentaItems(){
+  const total=ventaItems.reduce((s,i)=>s+i.subtotal,0);
+  document.getElementById('venta-items-list').innerHTML=ventaItems.map((i,idx)=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border-bottom:1px solid var(--border2)">
+      <div><strong>${i.cantidad}x</strong> ${i.nombre}</div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span>${fmt(i.subtotal)}</span><button class="btn btn-outline btn-sm" onclick="removeVentaItem(${idx})" style="padding:0.2rem 0.4rem">✕</button></div>
+    </div>`
+  ).join('');
+  document.getElementById('venta-total').textContent=fmt(total);
+}
+
+// ═══════════════════════════════════
+// SAVE FUNCTIONS
+// ═══════════════════════════════════
+function saveProducto(editId){
+  const nombre=document.getElementById('f-prod-nombre').value.trim();
+  if(!nombre){alert('Ingresá el nombre');return}
+  const d=getData();
+  const obj={
+    id:editId||genId(),nombre,
+    categoria:document.getElementById('f-prod-cat').value.trim(),
+    costoUnitario:Number(document.getElementById('f-prod-costo').value)||0,
+    precioVenta:Number(document.getElementById('f-prod-precio').value)||0,
+    receta:recetaDraft.slice(),
+    rinde:Number(document.getElementById('f-prod-rinde').value)||1,
+  };
+  if(editId){const idx=d.productos.findIndex(p=>p.id===editId);if(idx>=0)d.productos[idx]=obj}
+  else{d.productos.push(obj)}
+  saveData(d);closeModal();render();
+}
+
+function editProducto(id){openModal('producto',id)}
+
+function saveCompra(){
+  const insumo=document.getElementById('f-comp-insumo').value.trim();
+  const precio=Number(document.getElementById('f-comp-precio').value);
+  if(!insumo||!precio){alert('Completá insumo y precio');return}
+  const d=getData();
+  d.compras.push({
+    id:genId(),
+    fecha:document.getElementById('f-comp-fecha').value,
+    insumo,
+    cantidad:Number(document.getElementById('f-comp-qty').value)||1,
+    unidad:document.getElementById('f-comp-unidad').value,
+    precioTotal:precio,
+  });
+  saveData(d);closeModal();render();
+}
+
+function saveVenta(){
+  if(!ventaItems.length){alert('Agregá al menos un producto');return}
+  const d=getData();
+  const total=ventaItems.reduce((s,i)=>s+i.subtotal,0);
+  d.ventas.push({
+    id:genId(),
+    fecha:document.getElementById('f-venta-fecha').value,
+    cliente:document.getElementById('f-venta-cliente').value.trim(),
+    items:[...ventaItems],
+    total,
+    estado:'pendiente',
+  });
+  saveData(d);closeModal();render();
+}
+
+function deleteItem(collection,id){
+  if(!confirm('¿Eliminar?'))return;
+  const d=getData();
+  d[collection]=d[collection].filter(x=>x.id!==id);
+  saveData(d);render();
+}
+
+// ═══════════════════════════════════
+// EXPORT
+// ═══════════════════════════════════
+function exportData(){
+  const d=getData();
+  const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='lomaspancha-backup-'+todayStr()+'.json';
+  a.click();
+}
+
+// ═══════════════════════════════════
+// INIT
+// ═══════════════════════════════════
+document.getElementById('logo-img').src='data:image/jpeg;base64,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';
+render();
+</script>
+</body>
+</html>
