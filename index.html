@@ -2,7 +2,11 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Lo Más Pancha">
+<meta name="theme-color" content="#c97b5a">
 <title>Lo Más Pancha — Gestión</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧁</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
@@ -101,22 +105,118 @@ tr:hover{background:var(--bg)}
 
 /* Animations */
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{transform:translateX(-100%)}to{transform:translateX(0)}}
 
-/* Responsive */
+/* Sidebar backdrop */
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:49;opacity:0;transition:opacity 0.3s}
+.sidebar-backdrop.visible{display:block;opacity:1}
+
+/* Table responsive wrapper with horizontal scroll fallback */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ═══ RESPONSIVE ═══ */
 @media(max-width:900px){
-.stat-grid{grid-template-columns:repeat(2,1fr)}
-.section-grid{grid-template-columns:1fr}
-.sidebar{transform:translateX(-100%)}
-.sidebar.open{transform:translateX(0)}
-.sidebar-toggle{display:flex;align-items:center;justify-content:center}
-.main{margin-left:0;padding:1.25rem;padding-top:3.5rem}
+  html{font-size:15px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:0.7rem}
+  .section-grid{grid-template-columns:1fr;gap:1rem}
+  .sidebar{transform:translateX(-100%);box-shadow:4px 0 24px rgba(0,0,0,0.1)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-toggle{display:flex;align-items:center;justify-content:center}
+  .main{margin-left:0;padding:1rem;padding-top:3.8rem}
+  .main-header{padding-top:0}
+  .stat-card{padding:0.9rem}
+  .stat-value{font-size:1.4rem}
+  .stat-label{font-size:0.78rem}
+  .chart-card{padding:1rem}
 }
-@media(max-width:500px){
-.stat-grid{grid-template-columns:1fr}
-.form-row{grid-template-columns:1fr}
-.main-header{flex-direction:column;align-items:flex-start;gap:0.8rem}
+
+@media(max-width:640px){
+  /* Form inputs at 16px to prevent iOS auto-zoom on focus */
+  .form-input,input,select,textarea{font-size:16px !important}
+  
+  /* Stats: 2 columns, tighter */
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:0.6rem;margin-bottom:1rem}
+  .stat-card{padding:0.8rem}
+  .stat-value{font-size:1.25rem}
+  .stat-icon{font-size:1.1rem}
+  .stat-sub{font-size:0.72rem}
+  
+  /* Header stacks */
+  .main-header{flex-direction:column;align-items:stretch;gap:0.7rem;margin-bottom:1rem}
+  .main-header > div:last-child{display:flex;gap:0.5rem;flex-wrap:wrap}
+  .main-title{font-size:1.3rem}
+  .main{padding:0.8rem;padding-top:3.6rem}
+  
+  /* Buttons bigger for touch */
+  .btn{padding:0.7rem 1rem;font-size:0.88rem;min-height:42px}
+  .btn-sm{padding:0.45rem 0.7rem;font-size:0.78rem;min-height:34px}
+  .btn-primary,.btn-accent,.btn-danger,.btn-outline{justify-content:center}
+  
+  /* Forms */
+  .form-row{grid-template-columns:1fr;gap:0.6rem}
+  .form-group{margin-bottom:0.8rem}
+  .form-group label{font-size:0.85rem;margin-bottom:0.35rem}
+  .form-input{padding:0.7rem 0.8rem}
+  
+  /* Modal full screen on mobile */
+  .modal-overlay{padding:0;align-items:flex-end}
+  .modal{max-width:100%;max-height:95vh;border-radius:16px 16px 0 0;animation:slideUp 0.25s ease}
+  .modal-header{padding:1rem 1.1rem;position:sticky;top:0;background:var(--bg2);z-index:1}
+  .modal-body{padding:1rem 1.1rem}
+  .modal-footer{padding:0.8rem 1.1rem;position:sticky;bottom:0;background:var(--bg2);flex-direction:row;gap:0.5rem}
+  .modal-footer .btn{flex:1}
+  
+  /* Chart bars smaller */
+  .chart-bar-wrap{height:120px}
+  .chart-bar-label{font-size:0.6rem}
+  .chart-bar-val{font-size:0.62rem;top:-16px}
+  
+  /* Table cards — transform rows into stacked cards */
+  .table-wrap{background:transparent;border:none;box-shadow:none;overflow:visible}
+  .table-header{padding:0.5rem 0.2rem}
+  table{display:block}
+  table thead{display:none}
+  table tbody{display:block}
+  table tr{display:block;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:0.8rem;margin-bottom:0.6rem;box-shadow:var(--shadow)}
+  table tr:hover{background:var(--bg2)}
+  table td{display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0;border:none;border-bottom:1px dashed var(--border2);font-size:0.88rem;gap:0.8rem;text-align:right}
+  table td:last-child{border-bottom:none;padding-top:0.6rem}
+  table td::before{content:attr(data-label);font-weight:600;color:var(--text2);font-size:0.78rem;text-transform:uppercase;letter-spacing:0.04em;text-align:left;flex-shrink:0}
+  table td:not([data-label])::before{content:''}
+  /* Empty state in card mode */
+  table tr:has(.empty-state){padding:0;display:block}
+  table tr:has(.empty-state) td{display:block;text-align:center;padding:2rem 1rem}
+  table tr:has(.empty-state) td::before{display:none}
+  
+  /* Select inside table cells (used for estado de venta) */
+  table td select.form-input{width:auto;max-width:180px}
+  
+  /* Multiple buttons in actions column */
+  table td .btn-sm{min-height:36px;padding:0.4rem 0.7rem}
+  
+  /* Sidebar mobile adjustments */
+  .sidebar{width:85%;max-width:300px}
+  .sidebar-toggle{width:44px;height:44px;top:0.6rem;left:0.6rem}
+  
+  /* Login screen mobile */
+  #login-screen > div{padding:1.5rem !important;border-radius:14px !important}
+  
+  /* Sync indicator mobile */
+  #sync-indicator{top:auto;bottom:1rem;right:1rem;left:auto;font-size:0.72rem;padding:0.4rem 0.7rem}
 }
-/* Login screen */
+
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
+/* Safe area para iPhone con notch */
+@supports(padding:max(0px)){
+  .main{padding-left:max(1rem,env(safe-area-inset-left));padding-right:max(1rem,env(safe-area-inset-right))}
+  .sidebar{padding-left:env(safe-area-inset-left)}
+  .sidebar-toggle{top:max(0.6rem,env(safe-area-inset-top));left:max(0.6rem,env(safe-area-inset-left))}
+  #sync-indicator{bottom:max(1rem,env(safe-area-inset-bottom));right:max(1rem,env(safe-area-inset-right))}
+  .modal-footer{padding-bottom:max(0.8rem,env(safe-area-inset-bottom))}
+}
+
+/* Login screen (legacy - still used) */
 .login-overlay{position:fixed;inset:0;background:var(--bg);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
 .login-card{background:#fff;border-radius:16px;padding:2rem;max-width:400px;width:100%;box-shadow:var(--shadow-lg)}
 .login-logo{text-align:center;margin-bottom:1.5rem}
@@ -160,7 +260,8 @@ tr:hover{background:var(--bg)}
   <span id="sync-text">☁️ Sincronizado</span>
 </div>
 
-<button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar(false)"></div>
 
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-logo">
@@ -514,11 +615,21 @@ function todayStr(){return new Date().toISOString().split('T')[0]}
 // ═══════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════
+function toggleSidebar(forceState){
+  const sidebar=document.querySelector('.sidebar');
+  const backdrop=document.getElementById('sidebar-backdrop');
+  const shouldOpen=forceState!==undefined?forceState:!sidebar.classList.contains('open');
+  sidebar.classList.toggle('open',shouldOpen);
+  if(backdrop)backdrop.classList.toggle('visible',shouldOpen);
+}
+
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.page===name));
-  document.querySelector('.sidebar').classList.remove('open');
+  toggleSidebar(false);
+  // Scroll al tope al cambiar de página (útil en mobile)
+  window.scrollTo({top:0,behavior:'instant'});
   render();
 }
 
@@ -537,6 +648,23 @@ function render(){
   renderCostos(d);
   renderInteligencia(d);
   updateStockBadge(d);
+  applyMobileTableLabels();
+}
+
+// Para modo card-mobile: cada <td> toma como label el <th> correspondiente
+function applyMobileTableLabels(){
+  document.querySelectorAll('table').forEach(table=>{
+    const headers=Array.from(table.querySelectorAll('thead th')).map(th=>th.textContent.trim());
+    if(!headers.length)return;
+    table.querySelectorAll('tbody tr').forEach(tr=>{
+      const cells=tr.querySelectorAll('td');
+      // No poner data-label a la fila de empty-state (colspan)
+      if(cells.length===1&&cells[0].getAttribute('colspan'))return;
+      cells.forEach((td,i)=>{
+        if(headers[i])td.setAttribute('data-label',headers[i]);
+      });
+    });
+  });
 }
 
 // ═══════════════════════════════════
@@ -559,9 +687,9 @@ function renderDashboard(d){
     const items=insumosAlerta.slice(0,6).map(i=>{
       const color=i.estado==='critico'?'var(--danger)':'var(--warn)';
       const icon=i.estado==='critico'?'⚠️':'🔔';
-      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.7rem;background:#fff;border-radius:8px;border-left:3px solid ${color}">
-        <div><strong>${icon} ${i.nombre}</strong> <span style="color:var(--text3);font-size:0.82rem">— ${i.proveedor||'sin proveedor'}</span></div>
-        <div style="font-size:0.85rem;color:${color};font-weight:700">${fmtStock(i.stock,i.unidadBase)}${i.stockMinimo>0?` / min ${fmtStock(i.stockMinimo,i.unidadBase)}`:''}</div>
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0.7rem;background:#fff;border-radius:8px;border-left:3px solid ${color};gap:0.5rem;flex-wrap:wrap">
+        <div style="min-width:0;flex:1"><strong>${icon} ${i.nombre}</strong> <span style="color:var(--text3);font-size:0.82rem">${i.proveedor?'— '+i.proveedor:''}</span></div>
+        <div style="font-size:0.85rem;color:${color};font-weight:700;white-space:nowrap">${fmtStock(i.stock,i.unidadBase)}${i.stockMinimo>0?` / ${fmtStock(i.stockMinimo,i.unidadBase)}`:''}</div>
       </div>`;
     }).join('');
     alertasCont.innerHTML=`
@@ -625,17 +753,17 @@ function renderDashVendedores(d){
   cont.innerHTML=ranking.map(([id,s],idx)=>{
     const pct=(s.total/maxTotal*100).toFixed(0);
     const medal=medals[idx]||'&nbsp;&nbsp;&nbsp;';
-    return `<div style="display:grid;grid-template-columns:auto 2fr 3fr auto;gap:0.8rem;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border2)">
+    return `<div style="display:grid;grid-template-columns:auto 1fr auto;gap:0.6rem;align-items:center;padding:0.6rem 0;border-bottom:1px solid var(--border2)">
       <div style="font-size:1.2rem;min-width:24px">${medal}</div>
-      <div style="display:flex;align-items:center;gap:0.5rem">
-        <span style="width:28px;height:28px;border-radius:50%;background:var(--brand3);color:var(--brand2);display:inline-flex;align-items:center;justify-content:center;font-weight:700">${s.nombre.charAt(0).toUpperCase()}</span>
-        <div>
-          <div style="font-weight:700">${s.nombre}</div>
-          <div style="font-size:0.78rem;color:var(--text3)">${s.cantidad} ${s.cantidad===1?'venta':'ventas'} · ${s.unidades} u.</div>
+      <div style="display:flex;align-items:center;gap:0.5rem;min-width:0">
+        <span style="width:32px;height:32px;border-radius:50%;background:var(--brand3);color:var(--brand2);display:inline-flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${s.nombre.charAt(0).toUpperCase()}</span>
+        <div style="min-width:0;flex:1">
+          <div style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.nombre}</div>
+          <div style="font-size:0.75rem;color:var(--text3)">${s.cantidad} ${s.cantidad===1?'venta':'ventas'} · ${s.unidades} u.</div>
+          <div style="background:var(--bg3);height:6px;border-radius:3px;overflow:hidden;margin-top:0.3rem"><div style="background:var(--brand);height:100%;width:${pct}%;transition:width 0.3s"></div></div>
         </div>
       </div>
-      <div style="background:var(--bg3);height:8px;border-radius:4px;overflow:hidden"><div style="background:var(--brand);height:100%;width:${pct}%;transition:width 0.3s"></div></div>
-      <div style="font-weight:700;text-align:right;min-width:90px">${fmt(s.total)}</div>
+      <div style="font-weight:700;text-align:right;white-space:nowrap">${fmt(s.total)}</div>
     </div>`;
   }).join('');
 }
